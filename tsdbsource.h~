@@ -1,0 +1,106 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <math.h>
+
+class RealTimeStamp
+{
+    public:
+        std::string toString()
+        {
+            int num_seconds, num_minutes, num_hours, num_days, num_months, num_years;
+            
+	    num_seconds = static_cast<int>( floor(value_m) );
+            num_minutes = num_seconds / 60;
+            num_hours = num_minutes / 60;
+            num_days = num_hours / 24;
+//           num_months = days / 30;
+//            num_years = days / 365;
+            
+            std::ostringstream ss;
+            ss << num_hours % 24 << ":" << num_minutes % 60 << ":" << num_seconds % 60 << "." << floor((value_m - num_seconds)*100);
+            return ss.str();
+        }
+
+        double value_m;
+};
+
+template<class KnotType>
+class Curve
+{
+    public:
+        std::string toString()
+        {
+        }
+};
+
+class Double
+{
+    public:
+        std::string toString()
+        {
+            std::ostringstream ss;
+            ss << value_m;
+            return ss.str();
+        }
+        
+        double value_m;
+};
+
+template<class IndexType, class ValueType>
+class Knot
+{
+public:
+    Knot(IndexType index, IndexType value) : index_m(index), value_m(value) {} 
+    Knot() {}
+    
+    std::string toString()
+    {
+        std::ostringstream ss;
+        ss << index_m.toString();
+        ss << " :: ";
+        ss << value_m;
+        return ss.str(); 
+    }
+    
+    IndexType index_m;
+    ValueType value_m;
+};
+
+template<class KnotType>
+class TsdbSource
+{
+    public:
+        TsdbSource(std::string filename)
+        {
+            fileStream_m.open(filename.c_str(), std::ios::binary);
+  
+            if(fileStream_m.fail())
+            {
+                std::cout << "File Open FAIL" << std::endl;
+            }
+            else
+            {
+                std::cout << "File Open WIN" << std::endl;
+            }
+        }
+    
+        void seekToBeginning()
+        {
+            
+        }
+        
+        KnotType getValue()
+        {
+            KnotType k;
+            double foo;
+            fileStream_m.read((char*) &k.index_m.value_m, sizeof(foo));
+            fileStream_m.read((char*) &k.value_m, sizeof(foo));            
+            return k;
+        }
+    private:
+        std::ifstream fileStream_m;
+};
+
+typedef Knot<RealTimeStamp, double> RTKnot;
+typedef TsdbSource<RTKnot> RTTsdbSource;
